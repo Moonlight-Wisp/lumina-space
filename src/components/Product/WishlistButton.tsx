@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useUserStore } from '@/store/useUserStore';
@@ -17,7 +19,8 @@ export default function WishlistButton({ productId }: Props) {
 
   useEffect(() => {
     if (!uid) return;
-    axios.get(`/api/wishlist?userId=${uid}`)
+    axios
+      .get(`/api/wishlist?userId=${uid}`)
       .then(res => setInWishlist(res.data.productIds?.includes(productId)))
       .catch(() => setInWishlist(false));
   }, [uid, productId]);
@@ -30,7 +33,9 @@ export default function WishlistButton({ productId }: Props) {
     setLoading(true);
     try {
       if (inWishlist) {
-        await axios.delete('/api/wishlist', { data: { userId: uid, productId } });
+        await axios.delete('/api/wishlist', {
+          data: { userId: uid, productId },
+        });
         setInWishlist(false);
         toast('Retiré de votre wishlist', { icon: '💔' });
       } else {

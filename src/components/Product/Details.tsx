@@ -19,10 +19,9 @@ const Details = ({ product }: Props) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <h1 className={styles.title}>{product.name}</h1>
-        <WishlistButton productId={product._id || product.id} />
+        <h1 className={styles.title}>{product.title}</h1>
+        <WishlistButton productId={product.id} />
       </div>
 
       <div className={styles.priceSection}>
