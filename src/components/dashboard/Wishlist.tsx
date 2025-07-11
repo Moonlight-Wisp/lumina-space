@@ -13,26 +13,39 @@ export default function Wishlist() {
   useEffect(() => {
     if (!uid) return;
     const fetchWishlist = async () => {
-      const { data } = await axios.get(`/api/wishlist?userId=${uid}`);
-      setWishlist(data.productIds || []);
-      if (data.productIds && data.productIds.length > 0) {
-        const res = await axios.get('/api/products');
-        setProducts(res.data.filter((p: Product) => data.productIds.includes(p._id || p.id)));
-      } else {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(`/api/wishlist?userId=${uid}`);
+        setWishlist(data.productIds || []);
+        if (data.productIds && data.productIds.length > 0) {
+          const res = await axios.get('/api/products');
+          setProducts(res.data.filter((p: Product) => data.productIds.includes(p.id)));
+        } else {
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement de la wishlist", error);
         setProducts([]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchWishlist();
   }, [uid]);
 
   const handleRemove = async (productId: string) => {
-    await axios.delete('/api/wishlist', { data: { userId: uid, productId } });
-    setWishlist(wishlist.filter(id => id !== productId));
-    setProducts(products.filter(p => (p._id || p.id) !== productId));
+    if (!uid) return;
+    try {
+      await axios.delete('/api/wishlist', { data: { userId: uid, productId } });
+      setWishlist(wishlist.filter(id => id !== productId));
+      setProducts(products.filter(p => p.id !== productId));
+    } catch (error) {
+      console.error("Erreur lors de la suppression du produit", error);
+    }
   };
 
   if (loading) return <Spinner animation="border" className="mt-4" />;
+
   if (!products.length) return <div className="mt-4">Votre liste de souhaits est vide.</div>;
 
   return (
@@ -40,13 +53,13 @@ export default function Wishlist() {
       <h5>Ma liste de souhaits</h5>
       <div className="row">
         {products.map(product => (
-          <div className="col-md-4 mb-3" key={product._id || product.id}>
+          <div className="col-md-4 mb-3" key={product.id}>
             <Card className="glass-bg h-100 border-0 text-center p-3">
               <Card.Img variant="top" src={product.images?.[0]} style={{ objectFit: 'cover', height: 180 }} />
               <Card.Body>
                 <Card.Title>{product.title}</Card.Title>
                 <Card.Text>{product.price} €</Card.Text>
-                <Button variant="outline-danger" onClick={() => handleRemove(product._id || product.id)}>
+                <Button variant="outline-danger" onClick={() => handleRemove(product.id)}>
                   Retirer
                 </Button>
               </Card.Body>
