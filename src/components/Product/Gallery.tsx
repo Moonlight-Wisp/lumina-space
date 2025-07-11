@@ -1,20 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Thumbs, Zoom } from 'swiper/modules';
+import type SwiperType from 'swiper'; // Import type Swiper
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
 import 'swiper/css/zoom';
-import styles from './Gallery.module.css'; 
+import styles from './Gallery.module.css';
 
 type Props = {
   images: string[];
 };
 
 const Gallery = ({ images }: Props) => {
-  const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
 
   return (
     <div className={styles.galleryWrapper}>
@@ -29,8 +31,14 @@ const Gallery = ({ images }: Props) => {
       >
         {images.map((src, index) => (
           <SwiperSlide key={index}>
-            <div className="swiper-zoom-container">
-              <img src={src} alt={`Image ${index + 1}`} />
+            <div className="swiper-zoom-container" style={{ position: 'relative', width: '100%', height: '400px' }}>
+              <Image
+                src={src}
+                alt={`Image ${index + 1}`}
+                fill
+                style={{ objectFit: 'contain' }}
+                priority={index === 0}
+              />
             </div>
           </SwiperSlide>
         ))}
@@ -47,7 +55,15 @@ const Gallery = ({ images }: Props) => {
       >
         {images.map((src, index) => (
           <SwiperSlide key={index}>
-            <img src={src} alt={`Thumbnail ${index + 1}`} className={styles.thumbnail} />
+            <div style={{ position: 'relative', width: '100%', height: '80px' }}>
+              <Image
+                src={src}
+                alt={`Thumbnail ${index + 1}`}
+                fill
+                style={{ objectFit: 'cover', borderRadius: '4px' }}
+                priority={index === 0}
+              />
+            </div>
           </SwiperSlide>
         ))}
       </Swiper>

@@ -13,7 +13,7 @@ export default function SuccessPage() {
 
   useEffect(() => {
     clearCart(); // Vide le panier à l'arrivée sur la page de succès
-  }, []);
+  }, [clearCart]);
 
   return (
     <Container className="py-5 d-flex flex-column align-items-center text-center">

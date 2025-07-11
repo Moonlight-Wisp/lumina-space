@@ -14,3 +14,15 @@ export interface Product {
   createdAt: Date;
   updatedAt?: Date;
 }
+
+
+export interface ProductReview {
+  _id: string;          
+  productId: string;    
+  userId: string;       
+  userName: string;     
+  rating: number;       
+  comment: string;      
+  createdAt: Date;      
+  updatedAt?: Date;     
+}

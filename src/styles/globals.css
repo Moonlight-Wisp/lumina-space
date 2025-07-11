@@ -42,6 +42,16 @@ a:focus {
   text-decoration: underline;
 }
 
+
+
+body {
+  background-color: #f9f9f9;
+  color: #1a1a1a;
+  font-family: var(--font-outfit), sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
 /* ===== BUTTONS ACCENTUÉS ===== */
 .btn-accent {
   background-color: #54acad;
@@ -85,11 +95,13 @@ a:focus {
 /* ===== GLASS EFFECT CARD ===== */
 .glass-bg {
   background: rgba(255, 255, 255, 0.75);
+  -webkit-backdrop-filter: blur(10px); /* ✅ Ajout */
   backdrop-filter: blur(10px);
   border-radius: 14px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+
 .glass-bg:hover {
   transform: translateY(-6px);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
@@ -182,8 +194,10 @@ a:focus {
   width: 100%;
   height: 240px;
   border-radius: 14px 14px 0 0;
+  -webkit-user-select: none; 
   user-select: none;
 }
+
 
 /* ===== CONTAINER GLOBAL ===== */
 .container {
@@ -225,9 +239,11 @@ html[data-theme='dark'] .form-control {
 }
 html[data-theme='dark'] .glass-bg {
   background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(12px); /* ✅ Ajout */
   backdrop-filter: blur(12px);
   box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
 }
+
 html[data-theme='dark'] footer {
   background-color: #111;
   color: #ccc;

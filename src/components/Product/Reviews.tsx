@@ -23,8 +23,8 @@ const Reviews = ({ productId }: Props) => {
     try {
       const { data } = await axios.get(`/api/reviews/${productId}`);
       setReviews(data);
-    } catch (error) {
-      console.error('Erreur lors du chargement des avis', error);
+    } catch {
+      console.error('Erreur lors du chargement des avis');
     }
   }, [productId]);
 
@@ -46,7 +46,7 @@ const Reviews = ({ productId }: Props) => {
       setRating(0);
       setComment('');
       fetchReviews();
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors de l’envoi de l’avis');
     } finally {
       setLoading(false);

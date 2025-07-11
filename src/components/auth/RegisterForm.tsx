@@ -92,12 +92,13 @@ const RegisterForm = () => {
       </Form.Group>
 
       <Form.Group className="mb-4">
-        <Form.Label htmlFor="role">Type de compte</Form.Label>
+        <Form.Label id="role-label" htmlFor="role">Type de compte</Form.Label>
         <Form.Select
           id="role"
           name="role"
           value={form.role}
           onChange={handleChange}
+          aria-labelledby="role-label"
         >
           <option value="client">Client</option>
           <option value="vendeur">Vendeur</option>

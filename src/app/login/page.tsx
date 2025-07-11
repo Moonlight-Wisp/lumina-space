@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useUserStore } from '@/store/useUserStore';
@@ -30,10 +31,10 @@ export default function LoginPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [userStore]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -46,6 +47,7 @@ export default function LoginPage() {
       if (!userCred.user.emailVerified) {
         toast.error('Veuillez vérifier votre e-mail avant de vous connecter.');
         await auth.signOut();
+        setLoading(false);
         return;
       }
 
@@ -58,8 +60,10 @@ export default function LoginPage() {
 
       toast.success('Connexion réussie !');
       router.push('/dashboard/client');
-    } catch (error: any) {
-      toast.error('Identifiants invalides');
+    } catch (error) {
+      // On peut affiner le typage si besoin, ici on cast any par sécurité
+      const message = (error as Error).message || 'Identifiants invalides';
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -75,28 +79,25 @@ export default function LoginPage() {
       }}
     >
       <Row className="w-100" style={{ maxWidth: 1100 }}>
-        <Col
-          md={6}
-          className="d-none d-md-flex align-items-center justify-content-center"
-        >
-          <img
+        <Col md={6} className="d-none d-md-flex align-items-center justify-content-center position-relative" style={{ minHeight: 500 }}>
+          <Image
             src="/images/login-side.png"
             alt="Connexion Lumina"
-            className="img-fluid mb-6 animate__animated animate__fadeInLeft"
+            fill
+            style={{ objectFit: 'contain' }}
+            className="mb-6 animate__animated animate__fadeInLeft"
+            priority
           />
         </Col>
 
-        <Col
-          md={6}
-          className="d-flex align-items-center justify-content-center"
-        >
+        <Col md={6} className="d-flex align-items-center justify-content-center">
           <Card
             className="p-4 glass-bg w-100 animate__animated animate__fadeInUp"
             style={{ maxWidth: 480 }}
           >
             <h3 className="mb-4 text-center">Connexion</h3>
             <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3">
+              <Form.Group className="mb-3" controlId="email">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
@@ -104,10 +105,11 @@ export default function LoginPage() {
                   required
                   onChange={handleChange}
                   placeholder="exemple@mail.com"
+                  value={form.email}
                 />
               </Form.Group>
 
-              <Form.Group className="mb-4">
+              <Form.Group className="mb-4" controlId="password">
                 <Form.Label>Mot de passe</Form.Label>
                 <InputGroup>
                   <Form.Control
@@ -116,10 +118,12 @@ export default function LoginPage() {
                     required
                     onChange={handleChange}
                     placeholder="••••••••"
+                    value={form.password}
                   />
                   <Button
                     variant="outline-secondary"
-                    onClick={() => setShowPassword(!showPassword)}
+                    type="button"
+                    onClick={() => setShowPassword((show) => !show)}
                     aria-label="Afficher/Masquer le mot de passe"
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}

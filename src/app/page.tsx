@@ -45,11 +45,6 @@ const Galerie = [
   { id: 4, img:'/images/Galeries/df4728b4d7a17863354119aa85766c6a.jpg'},
 ];
 
-const testimonials = [
-  { name: 'Élodie M.', comment: 'Design élégant et ambiance magique à la maison. Je recommande à 100% !', img:"/images/Temoignages/35dd54ce9da554d665eb0979b0d7febd.jpg" },
-  { name: 'Jérôme T.', comment: 'Le contrôle via smartphone est fluide et intuitif. Superbe expérience !', img:"/images/Temoignages/92326e301c62d99d14bc323ed1cbebff.jpg"},
-];
-
 export default function Home() {
   const settings = {
     dots: true,
@@ -64,7 +59,7 @@ export default function Home() {
 
   return (
     <main>
-       {/* Hero Slider */}
+      {/* Hero Slider */}
       <section className="hero-slider-section">
         <Slider {...settings}>
           {heroSlides.map(slide => (
@@ -86,9 +81,8 @@ export default function Home() {
                 <Image
                   src={slide.src}
                   alt={slide.title}
-                  layout="fill"
-                  objectFit="cover"
-                  className="z-n1"
+                  fill
+                  style={{ objectFit: 'cover', zIndex: -1 }}
                 />
               )}
               <Container className="hero-content">
@@ -105,7 +99,7 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1 }}
                   className="hero-subtitle"
-                  color="rgb(240, 248, 255)"
+                  style={{ color: 'rgb(240, 248, 255)' }}
                 >
                   {slide.subtitle}
                 </motion.p>
@@ -118,8 +112,8 @@ export default function Home() {
         </Slider>
       </section>
 
-      {/* Nouveautes */}
-       <section className="py-5" style={{ background: '#f0fbfc' }}>
+      {/* Nouveautés */}
+      <section className="py-5" style={{ background: '#f0fbfc' }}>
         <Container>
           <h2 className="text-center mb-4">Nos Dernières Nouveautés</h2>
           <p className="text-center mb-4">Découvrez les ici en exclusivité et offrez-vous nos dernières innovations.</p>
@@ -127,7 +121,7 @@ export default function Home() {
             {nouveautes.map(p => (
               <Col md={3} key={p.id} className="mb-3">
                 <Card className="glass-bg h-100 border-0">
-                 <Image src={p.img} alt={p.name} width={400} height={240} className="card-img-cover"/>
+                  <Image src={p.img} alt={p.name} width={400} height={240} className="card-img-cover"/>
                   <Card.Body>
                     <Card.Title>{p.name}</Card.Title>
                     <Card.Text className="fw-bold">{p.price}</Card.Text>
@@ -146,13 +140,13 @@ export default function Home() {
           <h2 className={`text-center mb-4 ${styles.homeTitle}`}>Nos univers lumineux</h2>
           <p className={`text-center mb-4 ${styles.homeSubtitle}`}>Explorez nos catégories phares et trouvez l’inspiration pour chaque pièce de votre maison.</p>
           <Row>
-            {categories.map((c, i) => (
+            {categories.map((c, index) => (
               <Col md={4} key={c.id} className="mb-4">
                 <Card className="glass-bg h-100 border-0 text-center p-3">
                   <div className={styles.categoryIcon}>
-                    {i === 0 && <FaLightbulb className="category-icon" />} 
-                    {i === 1 && <FaCubes className="category-icon" />} 
-                    {i === 2 && <FaRobot className="category-icon" />}
+                    {index === 0 && <FaLightbulb className="category-icon" />} 
+                    {index === 1 && <FaCubes className="category-icon" />} 
+                    {index === 2 && <FaRobot className="category-icon" />}
                   </div>
                   <Image src={c.img} alt={c.title} width={400} height={240} className="card-img-cover mb-2"/>
                   <Card.Body>
@@ -172,7 +166,7 @@ export default function Home() {
           <h2 className={`text-center mb-4 ${styles.homeTitle}`}>Nos Bestsellers</h2>
           <p className={`text-center mb-4 ${styles.homeSubtitle}`}>Les produits préférés de nos clients, plébiscités pour leur design et leur innovation.</p>
           <Row>
-            {bestSellers.map((p, i) => (
+            {bestSellers.map((p) => (
               <Col md={4} key={p.id} className="mb-4">
                 <Card className="glass-bg h-100 border-0 text-center p-3">
                   <span className={styles.bestsellerBadge}><FaStar className="me-1" /> Bestseller</span>
@@ -239,15 +233,6 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Expériences utilisateurs
-      <section className="py-5 text-center">
-        <Container>
-          <h2>Une expérience immersive</h2>
-          <p>Synchronisation avec la musique, l’écran, ou création d’ambiances pour chaque moment.</p>
-          <Image src="/images/experience.jpg" alt="Expérience immersive" width={900} height={400} className="rounded mt-3" />
-        </Container>
-      </section> */}
-
       {/* Galerie - Carrousel automatique */}
       <section className="py-5" style={{ background: '#e3f5f7' }}>
         <Container>
@@ -281,7 +266,6 @@ export default function Home() {
           </Slider>
         </Container>
       </section>
-
 
       {/* Témoignages avec photo */}
       <section className="py-5">
@@ -317,6 +301,7 @@ export default function Home() {
           </Row>
         </Container>
       </section>
+
       {/* CTA finale */}
       <section className="py-5 text-center">
         <Container>

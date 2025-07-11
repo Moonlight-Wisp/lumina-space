@@ -1,13 +1,13 @@
 "use client";
 
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   createUserWithEmailAndPassword,
   updateProfile,
   sendEmailVerification,
-} from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import {
   Form,
   Button,
@@ -17,9 +17,15 @@ import {
   Col,
   InputGroup,
   Modal,
-} from 'react-bootstrap';
-import toast from 'react-hot-toast';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+} from "react-bootstrap";
+import toast from "react-hot-toast";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Image from "next/image";
+
+interface FirebaseError {
+  code: string;
+  message: string;
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -29,11 +35,11 @@ export default function RegisterPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,13 +49,17 @@ export default function RegisterPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
-      toast.error('Les mots de passe ne correspondent pas.');
+      toast.error("Les mots de passe ne correspondent pas.");
       return;
     }
 
     setLoading(true);
     try {
-      const userCred = await createUserWithEmailAndPassword(auth, form.email, form.password);
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password
+      );
       await updateProfile(userCred.user, {
         displayName: `${form.firstName} ${form.lastName}`,
       });
@@ -64,22 +74,45 @@ export default function RegisterPage() {
           clearInterval(interval);
         }
       }, 3000);
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      const err = error as FirebaseError;
+      toast.error(err.message || "Une erreur est survenue.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container fluid className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh', background: 'url(/images/register-bg.jpg) no-repeat center/cover' }}>
+    <Container
+      fluid
+      className="d-flex justify-content-center align-items-center"
+      style={{
+        minHeight: "100vh",
+        background: "url(/images/register-bg.jpg) no-repeat center/cover",
+      }}
+    >
       <Row className="w-100" style={{ maxWidth: 1100 }}>
-        <Col md={6} className="d-none d-md-flex align-items-center justify-content-center">
-          <img src="/images/register-side.png" alt="LUMINA register" className="img-fluid mb-6 animate__animated animate__fadeInLeft" />
+        <Col
+          md={6}
+          className="d-none d-md-flex align-items-center justify-content-center"
+        >
+          <Image
+            src="/images/register-side.png"
+            alt="LUMINA register"
+            width={600}
+            height={800}
+            className="img-fluid mb-6 animate__animated animate__fadeInLeft"
+          />
         </Col>
 
-        <Col md={6} className="d-flex align-items-center justify-content-center">
-          <Card className="p-4 glass-bg w-100 animate__animated animate__fadeInUp" style={{ maxWidth: 480 }}>
+        <Col
+          md={6}
+          className="d-flex align-items-center justify-content-center"
+        >
+          <Card
+            className="p-4 glass-bg w-100 animate__animated animate__fadeInUp"
+            style={{ maxWidth: 480 }}
+          >
             <h3 className="mb-4 text-center">Créer un compte</h3>
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
@@ -92,18 +125,26 @@ export default function RegisterPage() {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Email</Form.Label>
-                <Form.Control type="email" name="email" required onChange={handleChange} />
+                <Form.Control
+                  type="email"
+                  name="email"
+                  required
+                  onChange={handleChange}
+                />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Mot de passe</Form.Label>
                 <InputGroup>
                   <Form.Control
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     required
                     onChange={handleChange}
                   />
-                  <Button onClick={() => setShowPassword(!showPassword)}>
+                  <Button
+                    onClick={() => setShowPassword(!showPassword)}
+                    type="button"
+                  >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </Button>
                 </InputGroup>
@@ -112,12 +153,15 @@ export default function RegisterPage() {
                 <Form.Label>Confirmer le mot de passe</Form.Label>
                 <InputGroup>
                   <Form.Control
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showConfirmPassword ? "text" : "password"}
                     name="confirmPassword"
                     required
                     onChange={handleChange}
                   />
-                  <Button onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  <Button
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    type="button"
+                  >
                     {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                   </Button>
                 </InputGroup>
@@ -128,7 +172,7 @@ export default function RegisterPage() {
                 disabled={loading}
                 className="w-100 btn-accent"
               >
-                {loading ? 'Création...' : "S’inscrire"}
+                {loading ? "Création..." : "S’inscrire"}
               </Button>
             </Form>
           </Card>
@@ -153,7 +197,7 @@ export default function RegisterPage() {
           <Button
             variant="secondary"
             disabled={!isVerified}
-            onClick={() => router.push('/login')}
+            onClick={() => router.push("/login")}
           >
             Se connecter
           </Button>
