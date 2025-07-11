@@ -1,0 +1,36 @@
+.cart-img {
+  object-fit: cover;
+}
+
+.cart-qty-cell {
+  max-width: 100px;
+}
+
+.header-blur {
+  backdrop-filter: blur(12px);
+}
+
+.header-brand {
+  letter-spacing: 2px;
+  font-weight: 700;
+  font-size: 22px;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-star {
+  color: #ffe066;
+  transition: color 0.2s;
+}
+
+.header-star-light {
+  color: #0dcaf0;
+  transition: color 0.2s;
+}
+
+.cart-badge-custom {
+  font-size: 13px;
+  min-width: 22px;
+}

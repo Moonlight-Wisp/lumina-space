@@ -1,0 +1,7 @@
+.cart-img {
+  object-fit: cover;
+}
+
+.cart-qty-cell {
+  max-width: 100px;
+}

@@ -1,0 +1,52 @@
+.detailsWrapper {
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.priceSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #54acad;
+}
+
+.inStock {
+  color: green;
+  font-weight: 500;
+}
+
+.outOfStock {
+  color: crimson;
+  font-weight: 500;
+}
+
+.description {
+  margin: 1rem 0;
+  color: #333;
+}
+
+.meta p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+.sellerName {
+  font-weight: 500;
+  color: #54acad;
+}

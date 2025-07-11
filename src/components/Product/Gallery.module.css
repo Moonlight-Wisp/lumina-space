@@ -1,0 +1,35 @@
+.galleryWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mainSwiper {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.mainSwiper img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+}
+
+.thumbSwiper {
+  padding-top: 10px;
+}
+
+.thumbnail {
+  border-radius: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.thumbnail:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}

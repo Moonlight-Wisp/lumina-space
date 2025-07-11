@@ -1,0 +1,259 @@
+/* Import de la police principale */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ===== RESET & BASE ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Outfit', sans-serif;
+  scroll-behavior: smooth;
+  font-size: 16px;
+  line-height: 1.7;
+  transition: background-color 0.4s, color 0.4s;
+}
+
+/* ===== TEXTES & TITRES ===== */
+h1, h2, h3 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+h1 { font-size: 2.8rem; }
+h2 { font-size: 2.2rem; }
+h3 { font-size: 1.6rem; }
+p {
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+  transition: color 0.3s;
+}
+
+/* ===== LIENS ===== */
+a {
+  color: #54acad;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+a:hover,
+a:focus {
+  color: #3e8f7c;
+  text-decoration: underline;
+}
+
+/* ===== BUTTONS ACCENTUÉS ===== */
+.btn-accent {
+  background-color: #54acad;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.2s ease;
+}
+.btn-accent:hover,
+.btn-accent:focus {
+  background-color: #3e8f7c;
+  transform: translateY(-2px);
+}
+.btn-accent:disabled {
+  background-color: #a0c9d6;
+  cursor: not-allowed;
+}
+
+/* ===== INPUTS ===== */
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+/* ===== PASSWORD TOGGLE ICON ===== */
+.input-group > .btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 0 0.5rem;
+}
+
+/* ===== GLASS EFFECT CARD ===== */
+.glass-bg {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.glass-bg:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== HERO SLIDER ===== */
+.hero-slider-section {
+  width: 100%;
+  background-color: #f6f6f6;
+}
+.hero-slide {
+  position: relative;
+  height: 100vh;
+  min-height: 550px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 5%;
+  overflow: hidden;
+}
+.hero-slide video,
+.hero-slide img {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  z-index: 0;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  color: #fff;
+  text-align: left;
+  animation: fadeInUp 1s ease-out;
+}
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.hero-subtitle {
+  font-size: 1.35rem;
+  font-weight: 400;
+  margin-bottom: 1.75rem;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== Animation ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Responsive (Mobile) ===== */
+@media (max-width: 768px) {
+  .hero-slide {
+    height: 80vh;
+    justify-content: center;
+    text-align: center;
+    padding: 0 2rem;
+  }
+  .hero-content {
+    text-align: center;
+    margin: 0 auto;
+  }
+  .hero-title {
+    font-size: 2.2rem;
+  }
+  .hero-subtitle {
+    font-size: 1.05rem;
+  }
+}
+
+/* ===== IMAGES DES CARTES ===== */
+.card-img-top,
+.card-img-cover {
+  object-fit: cover;
+  object-position: center center;
+  width: 100%;
+  height: 240px;
+  border-radius: 14px 14px 0 0;
+  user-select: none;
+}
+
+/* ===== CONTAINER GLOBAL ===== */
+.container {
+  max-width: 1200px;
+  padding: 0 1rem;
+  margin: 0 auto;
+}
+
+/* ===== DARK THEME SUPPORT ===== */
+html[data-theme='dark'] {
+  background-color: #0d0d0d;
+  color: #f5f5f5;
+}
+html[data-theme='dark'] body {
+  background-color: #0d0d0d;
+  color: #f5f5f5;
+}
+html[data-theme='dark'] h1,
+html[data-theme='dark'] h2,
+html[data-theme='dark'] h3,
+html[data-theme='dark'] p,
+html[data-theme='dark'] a {
+  color: #e5e5e5;
+}
+html[data-theme='dark'] a:hover {
+  color: #6ad5dd;
+}
+html[data-theme='dark'] .btn-accent {
+  background-color: #6ad5dd;
+  color: #000;
+}
+html[data-theme='dark'] .btn-accent:hover {
+  background-color: #47afb7;
+}
+html[data-theme='dark'] .form-control {
+  background-color: #1a1a1a;
+  color: #fff;
+  border-color: #444;
+}
+html[data-theme='dark'] .glass-bg {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+}
+html[data-theme='dark'] footer {
+  background-color: #111;
+  color: #ccc;
+}
+html[data-theme='dark'] footer a:hover {
+  color: #6ad5dd;
+}
+html[data-theme='dark'] .navbar {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+html[data-theme='dark'] .navbar a,
+html[data-theme='dark'] .navbar-nav .nav-link {
+  color: #f0f0f0;
+}
+html[data-theme='dark'] .navbar a:hover {
+  color: #6ad5dd;
+}
+html[data-theme='dark'] .cart-badge {
+  background-color: #e74c3c;
+}
+html[data-theme='dark'] .hero-content {
+  color: #ffffff;
+}
+.rotate-icon {
+  transition: transform 0.4s ease;
+}
+.rotate-icon:hover {
+  transform: rotate(180deg);
+}
