@@ -27,7 +27,8 @@ const LoginForm = () => {
     if (res.success) {
       toast.success('Connexion réussie 🚀');
     } else {
-      if (res.error.includes('vérifier votre adresse')) {
+      // PROTECTION pour éviter l'erreur si res.error est undefined
+      if (typeof res.error === 'string' && res.error.includes('vérifier votre adresse')) {
         setEmailNotVerified(true);
         toast.error('Email non vérifié.');
       } else {
