@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
-    "lib": ["es2020"],
-    "module": "commonjs",
-    "target": "es2020",
-    "moduleResolution": "node",
-    "outDir": "lib",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "resolveJsonModule": true
+    "target": "ES2020",                        // Version JS générée
+    "lib": ["ES2020"],                         // Fonctions supportées
+    "module": "commonjs",                      // Requis par Firebase (Node.js runtime)
+    "moduleResolution": "node",               
+    "outDir": "lib",                           // Dossier de sortie après build
+    "rootDir": "src",                          // Dossier source (où est ton index.ts)
+    "strict": true,                            // Active toutes les vérifications strictes
+    "esModuleInterop": true,                   // Pour import/export compatibles
+    "forceConsistentCasingInFileNames": true,  // Bon pour systèmes sensibles à la casse
+    "skipLibCheck": true,                      // Ignore les types des libs
+    "sourceMap": true,                         // Utile pour debugger les fonctions
+    "resolveJsonModule": true,                 // Permet d'importer des fichiers JSON
+    "types": ["node"]                          // Reconnaît les types Node.js
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "lib"]
 }

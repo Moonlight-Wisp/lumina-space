@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <main className="main-content flex-grow-1">{children}</main>
             <Footer />
             <Toaster position="top-right" reverseOrder={false} />
-            <ChatWidgetClientWrapper />
+            {/* <ChatWidgetClientWrapper /> */}
           </div>
         </AuthProvider>
       </body>
