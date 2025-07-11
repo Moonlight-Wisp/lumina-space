@@ -2,14 +2,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { UserModel } from '@/models/User';
+import { User} from '@/models/User';
 
 export const dynamic = 'force-dynamic'; // si t’es en app router
 
 export async function GET(req: NextRequest, { params }: { params: { uid: string } }) {
   try {
     await connectToDatabase();
-    const user = await UserModel.findOne({ uid: params.uid });
+    const user = await User.findOne({ uid: params.uid });
 
     if (!user) {
       return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
