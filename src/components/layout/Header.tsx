@@ -13,6 +13,13 @@ import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 
+type Notification = {
+  _id: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+};
+
 export const Header = () => {
   const [expanded, setExpanded] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -20,13 +27,30 @@ export const Header = () => {
   const userStore = useUserStore();
   const cartStore = useCartStore();
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    userStore.logout();
-    toast.success("Déconnexion réussie !");
-    router.push('/');
+  const { isLoggedIn, role, uid } = userStore;
+  const cartCount =
+    cartStore.items?.reduce((acc, item) => acc + (item.quantity || 1), 0) || 0;
+
+  // Notifications
+  const [notifCount, setNotifCount] = useState(0);
+  const [showNotif, setShowNotif] = useState(false);
+
+  // Recharge les notifications à l'ouverture seulement
+  const toggleNotif = () => {
+    setShowNotif((prev) => {
+      if (!prev && uid) {
+        fetch(`/api/notifications?userId=${uid}`)
+          .then((res) => res.json())
+          .then((data: Notification[]) =>
+            setNotifCount(data.filter((n) => !n.read).length)
+          )
+          .catch(() => setNotifCount(0));
+      }
+      return !prev;
+    });
   };
 
+  // Firebase auth listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user && user.emailVerified) {
@@ -43,7 +67,7 @@ export const Header = () => {
     return () => unsubscribe();
   }, [userStore]);
 
-  // Gestion du thème clair/sombre
+  // Gestion thème clair/sombre
   useEffect(() => {
     if (theme === 'dark') {
       document.body.classList.add('dark-theme');
@@ -52,22 +76,14 @@ export const Header = () => {
     }
   }, [theme]);
 
-  const toggleTheme = () => setTheme(t => (t === 'light' ? 'dark' : 'light'));
+  const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
 
-  const { isLoggedIn, role } = userStore;
-  const cartCount = cartStore.items?.reduce((acc, item) => acc + (item.quantity || 1), 0) || 0;
-  // Pour la démo, on simule 2 notifications non lues (à remplacer par un vrai store ou API)
-  const [notifCount, setNotifCount] = useState(0);
-  const [showNotif, setShowNotif] = useState(false);
-  const { uid } = userStore;
-
-  // Récupère le nombre de notifications non lues
-  useEffect(() => {
-    if (!uid) return;
-    fetch(`/api/notifications?userId=${uid}`)
-      .then(res => res.json())
-      .then(data => setNotifCount(data.filter((n: any) => !n.read).length));
-  }, [uid, showNotif]);
+  const handleLogout = async () => {
+    await signOut(auth);
+    userStore.logout();
+    toast.success('Déconnexion réussie !');
+    router.push('/');
+  };
 
   return (
     <Navbar
@@ -78,8 +94,14 @@ export const Header = () => {
       className="glass-bg shadow-sm px-4 header-blur"
     >
       <Container>
-        <Navbar.Brand as={Link} href="/" className="header-brand d-flex align-items-center gap-2">
-          <span className={theme === 'dark' ? 'header-star' : 'header-star-light'}>★</span>
+        <Navbar.Brand
+          as={Link}
+          href="/"
+          className="header-brand d-flex align-items-center gap-2"
+        >
+          <span className={theme === 'dark' ? 'header-star' : 'header-star-light'}>
+            ★
+          </span>
           LUMINA SPACE
         </Navbar.Brand>
         <Navbar.Toggle
@@ -88,22 +110,41 @@ export const Header = () => {
         />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto" onClick={() => setExpanded(false)}>
-            <Nav.Link as={Link} href="/">Accueil</Nav.Link>
-            <Nav.Link as={Link} href="/products">Produits</Nav.Link>
-            <Nav.Link as={Link} href="/about">À propos</Nav.Link>
+            <Nav.Link as={Link} href="/">
+              Accueil
+            </Nav.Link>
+            <Nav.Link as={Link} href="/products">
+              Produits
+            </Nav.Link>
+            <Nav.Link as={Link} href="/about">
+              À propos
+            </Nav.Link>
           </Nav>
 
           <Nav className="align-items-center" onClick={() => setExpanded(false)}>
-
-            <Nav.Link onClick={toggleTheme} aria-label="Changer de thème" className="d-flex align-items-center">
+            <Nav.Link
+              onClick={toggleTheme}
+              aria-label="Changer de thème"
+              className="d-flex align-items-center"
+            >
               {theme === 'dark' ? <FaSun size={20} /> : <FaMoon size={20} />}
             </Nav.Link>
 
             <div style={{ position: 'relative' }}>
-              <NotificationBell count={notifCount} onClick={() => setShowNotif(v => !v)} />
+              <NotificationBell count={notifCount} onClick={toggleNotif} />
               {showNotif && (
-                <div style={{ position: 'absolute', right: 0, top: 36, zIndex: 1000, minWidth: 320 }}>
-                  <NotificationDropdown onRead={() => setNotifCount(c => Math.max(0, c - 1))} />
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: 36,
+                    zIndex: 1000,
+                    minWidth: 320,
+                  }}
+                >
+                  <NotificationDropdown
+                    onRead={() => setNotifCount((c) => Math.max(0, c - 1))}
+                  />
                 </div>
               )}
             </div>
@@ -114,7 +155,9 @@ export const Header = () => {
                 id="user-dropdown"
                 align="end"
               >
-                <NavDropdown.Item as={Link} href="/profile">Mon profil</NavDropdown.Item>
+                <NavDropdown.Item as={Link} href="/profile">
+                  Mon profil
+                </NavDropdown.Item>
                 {role === 'client' && (
                   <NavDropdown.Item as={Link} href="/dashboard/client">
                     Mon dashboard client
@@ -126,16 +169,27 @@ export const Header = () => {
                   </NavDropdown.Item>
                 )}
                 <NavDropdown.Divider />
-                <NavDropdown.Item onClick={handleLogout}>Déconnexion</NavDropdown.Item>
+                <NavDropdown.Item onClick={handleLogout}>
+                  Déconnexion
+                </NavDropdown.Item>
               </NavDropdown>
             ) : (
               <>
-                <Nav.Link as={Link} href="/login">Connexion</Nav.Link>
-                <Nav.Link as={Link} href="/register">S&apos;inscrire</Nav.Link>
+                <Nav.Link as={Link} href="/login">
+                  Connexion
+                </Nav.Link>
+                <Nav.Link as={Link} href="/register">
+                  S&apos;inscrire
+                </Nav.Link>
               </>
             )}
 
-            <Nav.Link as={Link} href="/cart" className="position-relative" aria-label="Voir le panier">
+            <Nav.Link
+              as={Link}
+              href="/cart"
+              className="position-relative"
+              aria-label="Voir le panier"
+            >
               <FaShoppingCart size={22} />
               {cartCount > 0 && (
                 <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge cart-badge-custom">

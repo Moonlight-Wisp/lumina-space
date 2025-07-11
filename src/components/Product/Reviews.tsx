@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { FaStar } from 'react-icons/fa';
 import { motion } from 'framer-motion';
@@ -12,7 +12,6 @@ import axios from 'axios';
 type Props = {
   productId: string;
 };
-
 const Reviews = ({ productId }: Props) => {
   const { uid, isLoggedIn } = useUserStore();
   const [reviews, setReviews] = useState<ProductReview[]>([]);
@@ -20,18 +19,18 @@ const Reviews = ({ productId }: Props) => {
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const { data } = await axios.get(`/api/reviews/${productId}`);
       setReviews(data);
     } catch (error) {
       console.error('Erreur lors du chargement des avis', error);
     }
-  };
+  }, [productId]);
 
   useEffect(() => {
     fetchReviews();
-  }, [productId]);
+  }, [fetchReviews]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

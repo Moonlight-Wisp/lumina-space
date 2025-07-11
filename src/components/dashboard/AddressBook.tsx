@@ -29,11 +29,11 @@ export default function AddressBook() {
       .finally(() => setLoading(false));
   }, [uid]);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSave = async (e: any) => {
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!uid) return;
     const data = { ...form, userId: uid };

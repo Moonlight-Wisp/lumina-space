@@ -4,9 +4,6 @@ import { useState } from 'react';
 import { Form, Button, Spinner } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import { registerUser } from '@/features/auth/register';
-import { User } from '@/types/user';
-import { Product } from '@/types/product';
-// etc.
 
 const RegisterForm = () => {
   const [form, setForm] = useState<{
@@ -22,9 +19,12 @@ const RegisterForm = () => {
     lastName: '',
     role: 'client',
   });
+
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -46,31 +46,62 @@ const RegisterForm = () => {
       <h2 className="text-center mb-4">Créer un compte</h2>
 
       <Form.Group className="mb-3">
-        <Form.Label>Prénom</Form.Label>
-        <Form.Control name="firstName" onChange={handleChange} required />
+        <Form.Label htmlFor="firstName">Prénom</Form.Label>
+        <Form.Control
+          id="firstName"
+          name="firstName"
+          value={form.firstName}
+          onChange={handleChange}
+          required
+        />
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Nom</Form.Label>
-        <Form.Control name="lastName" onChange={handleChange} required />
+        <Form.Label htmlFor="lastName">Nom</Form.Label>
+        <Form.Control
+          id="lastName"
+          name="lastName"
+          value={form.lastName}
+          onChange={handleChange}
+          required
+        />
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Email</Form.Label>
-        <Form.Control type="email" name="email" onChange={handleChange} required />
+        <Form.Label htmlFor="email">Email</Form.Label>
+        <Form.Control
+          type="email"
+          id="email"
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Mot de passe</Form.Label>
-        <Form.Control type="password" name="password" onChange={handleChange} required />
+        <Form.Label htmlFor="password">Mot de passe</Form.Label>
+        <Form.Control
+          type="password"
+          id="password"
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
       </Form.Group>
 
       <Form.Group className="mb-4">
-        <Form.Label>Type de compte</Form.Label>
-        <Form.Select name="role" onChange={handleChange}>
+        <Form.Label htmlFor="role">Type de compte</Form.Label>
+        <Form.Select
+          id="role"
+          name="role"
+          value={form.role}
+          onChange={handleChange}
+        >
           <option value="client">Client</option>
           <option value="vendeur">Vendeur</option>
-        </Form.Select>  
+        </Form.Select>
       </Form.Group>
 
       <Button variant="primary" type="submit" className="w-100 btn-glow" disabled={loading}>
