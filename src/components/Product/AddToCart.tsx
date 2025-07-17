@@ -5,7 +5,9 @@ import { Button, Form } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import { FaShoppingCart } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/useCartStore';
+import axios from 'axios';
 
 type Props = {
   product: {
@@ -19,26 +21,48 @@ type Props = {
 };
 
 const AddToCart = ({ product }: Props) => {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
   const { addItem } = useCartStore();
 
-  const handleAdd = () => {
-    if (product.stock === 0) {
-      toast.error('Produit en rupture de stock');
-      return;
+  const handleAdd = async () => {
+    try {
+      setLoading(true);
+
+      if (product.stock === 0) {
+        toast.error('Produit en rupture de stock');
+        return;
+      }
+
+      // Vérification et mise à jour du stock via l'API
+      const response = await axios.post('/api/purchase', {
+        productId: product._id,
+        quantity
+      });
+
+      if (response.data.status === 'success') {
+        addItem({
+          productId: product._id,
+          name: product.name,
+          image: product.image,
+          price: product.price,
+          stock: response.data.data.remainingStock,
+          sellerId: product.sellerId,
+          quantity,
+        });
+
+        toast.success(`${product.name} ajouté au panier`);
+        router.push('/cart');
+      } else {
+        toast.error(response.data.message || 'Erreur lors de l\'ajout au panier');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout au panier:', error);
+      toast.error('Erreur lors de l\'ajout au panier');
+    } finally {
+      setLoading(false);
     }
-
-    addItem({
-      productId: product._id,
-      name: product.name,
-      image: product.image,
-      price: product.price,
-      stock: product.stock,
-      sellerId: product.sellerId,
-      quantity,
-    });
-
-    toast.success(`${product.name} ajouté au panier`);
   };
 
   return (

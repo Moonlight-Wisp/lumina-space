@@ -1,5 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import type { Product } from '@/types/product';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/globals.css';
 import 'slick-carousel/slick/slick.css';
@@ -25,18 +28,7 @@ const categories = [
   { id: 3, title: 'Accessoires Futuristes', description: 'Technologie et style dans chaque détail.', img: '/images/Categorie/Accessoires.jpg' },
 ];
 
-const nouveautes = [
-  { id: 1, name: 'Matter Smart Lampe à corde multicolore (5m)', price: '89.99 €', img: '/images/Nouveautes/Matter-Smart-sans-fond.png'},
-  { id: 2, name: 'Lampes solaires de jardin (2 Paquet)', price: '59.99 €', img: '/images/Nouveautes/01-solar-garden-lights-shop-desktop@2x.webp' },
-  { id: 3, name: 'Kit Smart Multicolor Permanent Outdoor Lights Smarter Kit (15m)', price: '199,99 €', img: '/images/Nouveautes/01-permanent-outdoor-light-shop-15mts-b-desktop@2x.webp' },
-  { id: 4, name: 'Masque de luminothérapie LED', price:'130.99 €', img:'/images/Nouveautes/01-face-mask-nanoleaf-shop-desktop@2x.jpg'},
-];
-
-const bestSellers = [
-  { id: 1, name: 'Lampe Aurora RGB', price: '89.99€', img: '/images/Bestsellers/Lampe-Aurora-RGB.jpg' },
-  { id: 2, name: 'Cube Lumineux Intuitif', price: '59.99€', img: '/images/Bestsellers/Cube-Lumineux.jpg' },
-  { id: 3, name: 'Bande LED Synchronisée', price: '39.99€', img: '/images/Bestsellers/01-rope-light-shop-floating-desktop@2x.jpg' },
-];
+// Les produits seront chargés depuis la base de données
 
 const Galerie = [
   { id: 1, img:"/images/Galeries/7070c753ef1f2db1ac425d3785d40535.jpg"},
@@ -46,6 +38,33 @@ const Galerie = [
 ];
 
 export default function Home() {
+  const [nouveautes, setNouveautes] = useState<Product[]>([]);
+  const [bestSellers, setBestSellers] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await axios.get('/api/products');
+        console.log('Données des produits:', data);
+        // On trie par date de création pour les nouveautés
+        const sortedByDate = [...data].sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setNouveautes(sortedByDate.slice(0, 4)); // 4 derniers produits
+
+        // Pour les bestsellers, on prend les 3 premiers (à terme, on pourrait les trier par nombre de ventes)
+        setBestSellers(data.slice(0, 3));
+        setLoading(false);
+      } catch (error) {
+        console.error('Erreur lors du chargement des produits:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const settings = {
     dots: true,
     infinite: true,
@@ -118,18 +137,38 @@ export default function Home() {
           <h2 className="text-center mb-4">Nos Dernières Nouveautés</h2>
           <p className="text-center mb-4">Découvrez les ici en exclusivité et offrez-vous nos dernières innovations.</p>
           <Row>
-            {nouveautes.map(p => (
-              <Col md={3} key={p.id} className="mb-3">
-                <Card className="glass-bg h-100 border-0">
-                  <Image src={p.img} alt={p.name} width={400} height={240} className="card-img-cover"/>
-                  <Card.Body>
-                    <Card.Title>{p.name}</Card.Title>
-                    <Card.Text className="fw-bold">{p.price}</Card.Text>
-                    <Link href={`/product/${p.id}`}><Button className="btn-accent">Acheter</Button></Link>
-                  </Card.Body>
-                </Card>
+            {loading ? (
+              <Col xs={12} className="text-center">
+                <p>Chargement des nouveautés...</p>
               </Col>
-            ))}
+            ) : nouveautes.length === 0 ? (
+              <Col xs={12} className="text-center">
+                <p>Aucune nouveauté disponible pour le moment.</p>
+              </Col>
+            ) : (
+              nouveautes.map(p => (
+                <Col md={3} key={p._id} className="mb-3">
+                  <Card className="glass-bg h-100 border-0">
+                    <Link href={`/product/${p._id}`} className="text-decoration-none">
+                      <div style={{ position: 'relative', width: '100%', height: '240px' }}>
+                        <Image 
+                          src={p.images[0]} 
+                          alt={p.title} 
+                          fill 
+                          style={{ objectFit: 'cover' }}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
+                      <Card.Body>
+                        <Card.Title className="text-dark">{p.title}</Card.Title>
+                        <Card.Text className="fw-bold text-primary">{p.price}€</Card.Text>
+                        <Button className="btn-accent">Acheter</Button>
+                      </Card.Body>
+                    </Link>
+                  </Card>
+                </Col>
+              ))
+            )}
           </Row>
         </Container>
       </section>
@@ -166,19 +205,31 @@ export default function Home() {
           <h2 className={`text-center mb-4 ${styles.homeTitle}`}>Nos Bestsellers</h2>
           <p className={`text-center mb-4 ${styles.homeSubtitle}`}>Les produits préférés de nos clients, plébiscités pour leur design et leur innovation.</p>
           <Row>
-            {bestSellers.map((p) => (
-              <Col md={4} key={p.id} className="mb-4">
-                <Card className="glass-bg h-100 border-0 text-center p-3">
-                  <span className={styles.bestsellerBadge}><FaStar className="me-1" /> Bestseller</span>
-                  <Image src={p.img} alt={p.name} width={400} height={240} className="card-img-cover mb-2"/>
-                  <Card.Body>
-                    <Card.Title>{p.name}</Card.Title>
-                    <Card.Text className="fw-bold">{p.price}</Card.Text>
-                    <Link href={`/product/${p.id}`}><Button className="btn-accent">Acheter</Button></Link>
-                  </Card.Body>
-                </Card>
+            {loading ? (
+              <Col xs={12} className="text-center">
+                <p>Chargement des bestsellers...</p>
               </Col>
-            ))}
+            ) : bestSellers.length === 0 ? (
+              <Col xs={12} className="text-center">
+                <p>Aucun bestseller disponible pour le moment.</p>
+              </Col>
+            ) : (
+              bestSellers.map((p) => (
+                <Col md={4} key={p._id} className="mb-4">
+                  <Card className="glass-bg h-100 border-0 text-center p-3">
+                    <span className={styles.bestsellerBadge}><FaStar className="me-1" /> Bestseller</span>
+                    <Link href={`/product/${p._id}`} className="text-decoration-none">
+                      <Image src={p.images[0]} alt={p.title} width={400} height={240} className="card-img-cover mb-2"/>
+                      <Card.Body>
+                        <Card.Title className="text-dark">{p.title}</Card.Title>
+                        <Card.Text className="fw-bold text-primary">{p.price}€</Card.Text>
+                        <Button className="btn-accent">Acheter</Button>
+                      </Card.Body>
+                    </Link>
+                  </Card>
+                </Col>
+              ))
+            )}
           </Row>
         </Container>
       </section>

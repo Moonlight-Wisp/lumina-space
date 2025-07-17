@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useUserStore } from '@/store/useUserStore';
 import dynamic from 'next/dynamic';
+import { Button } from 'react-bootstrap';
 
 const ClientOrders = dynamic(() => import('@/components/dashboard/ClientOrders'), { ssr: false });
 const Wishlist = dynamic(() => import('@/components/dashboard/Wishlist'), { ssr: false });

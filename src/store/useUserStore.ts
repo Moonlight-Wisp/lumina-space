@@ -40,13 +40,11 @@ export const useUserStore = create<UserState>()(
           email,
           displayName,
           role,
-          isLoggedIn: true
+          isLoggedIn: true,
         }),
 
       logout: () => {
-        set({
-          ...initialState
-        });
+        set({ ...initialState });
         if (typeof window !== 'undefined') {
           localStorage.removeItem('user-store');
         }
@@ -54,7 +52,10 @@ export const useUserStore = create<UserState>()(
     }),
     {
       name: 'user-store',
-      storage: createJSONStorage(() => localStorage),
+      storage:
+        typeof window !== 'undefined'
+          ? createJSONStorage(() => localStorage)
+          : undefined,
       partialize: (state) => ({
         uid: state.uid,
         email: state.email,

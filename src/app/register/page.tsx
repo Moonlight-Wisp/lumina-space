@@ -106,15 +106,7 @@ export default function RegisterPage() {
           md={6}
           className="d-none d-md-flex align-items-center justify-content-center"
         >
-          <Image
-            src={imgError ? "/images/fallback-register.png" : "/images/register-side.png"}
-            alt="LUMINA register"
-            width={600}
-            height={800}
-            className="img-fluid mb-6 animate__animated animate__fadeInLeft"
-            onError={() => setImgError(true)}
-            priority
-          />
+
         </Col>
 
         <Col

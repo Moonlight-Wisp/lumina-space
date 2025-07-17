@@ -4,6 +4,8 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
+import { getFirebaseErrorMessage } from '@/utils/firebaseErrors';
 import { auth } from '@/lib/firebase';
 import { useUserStore } from '@/store/useUserStore';
 import { Form, Button, Container, Card, Row, Col, InputGroup } from 'react-bootstrap';
@@ -11,6 +13,8 @@ import toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 import styles from './page.module.css';
+import type { UserData } from '@/types/UserData';
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,6 +25,12 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
 
   useEffect(() => {
+    // Vérifier si l'utilisateur est déjà connecté
+    if (userStore.isLoggedIn) {
+      router.push('/');
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user && user.emailVerified) {
         userStore.setUser({
@@ -29,60 +39,76 @@ export default function LoginPage() {
           displayName: user.displayName ?? '',
           role: 'client',
         });
+        router.push('/');
       }
     });
 
     return () => unsubscribe();
-  }, [userStore]);
+  }, [userStore, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  if (!form.email || !form.password) {
+    toast.error('Veuillez remplir tous les champs');
+    return;
+  }
 
-    try {
-      const userCred = await signInWithEmailAndPassword(auth, form.email, form.password);
+  setLoading(true);
+  console.log("Tentative de connexion...");
 
-      if (!userCred.user.emailVerified) {
-        toast.error('Veuillez vérifier votre e-mail avant de vous connecter.');
-        await auth.signOut();
-        userStore.logout();
-        setLoading(false);
-        return;
+  try {
+    // Tentative de connexion avec gestion d'erreur
+    const userCred = await signInWithEmailAndPassword(
+      auth,
+      form.email.trim(),
+      form.password
+    ).catch((error) => {
+      if (error instanceof FirebaseError) {
+        throw new Error(getFirebaseErrorMessage(error));
       }
+      throw error;
+    });
 
-      const userData = {
-        uid: userCred.user.uid,
-        email: userCred.user.email!,
-        displayName: userCred.user.displayName ?? '',
-        role: 'client',
-      };
-
-      userStore.setUser(userData);
-      
-      // Vérification que le store est bien mis à jour
-      setTimeout(() => {
-        const state = useUserStore.getState();
-        if (state.isLoggedIn && state.uid) {
-          toast.success('Connexion réussie !');
-          router.push('/');
-        } else {
-          toast.error('Erreur de connexion, veuillez réessayer.');
-          auth.signOut();
-          userStore.logout();
-        }
-      }, 100);
-    } catch (error) {
-      // On peut affiner le typage si besoin, ici on cast any par sécurité
-      const message = (error as Error).message || 'Identifiants invalides';
-      toast.error(message);
-    } finally {
-      setLoading(false);
+    if (!userCred?.user) {
+      throw new Error('Erreur de connexion');
     }
-  };
+
+    // Vérification de l'email
+    if (!userCred.user.emailVerified) {
+      await auth.signOut();
+      userStore.logout();
+      throw new Error('Veuillez vérifier votre e-mail avant de vous connecter');
+    }
+
+    // Construction des données utilisateur
+    const userData: UserData = {
+      uid: userCred.user.uid,
+      email: userCred.user.email || '',
+      displayName: userCred.user.displayName || '',
+      role: 'client',
+    };
+
+    // Mise à jour du store
+    userStore.setUser(userData);
+
+    // Navigation après succès
+    toast.success('Connexion réussie !');
+    router.push('/');
+  } catch (error: unknown) {
+    let message = "Une erreur est survenue.";
+    if (error instanceof Error) {
+      message = error.message;
+    }
+    toast.error(message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <main className={styles.loginPage}>
