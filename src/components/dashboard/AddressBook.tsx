@@ -23,12 +23,17 @@ export default function AddressBook() {
   const [editing, setEditing] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!uid) return;
+    if (!uid) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     axios.get(`/api/addresses?userId=${uid}`)
       .then(res => setAddresses(res.data))
       .finally(() => setLoading(false));
   }, [uid]);
+
+  if (!uid) return <div className="mt-4 text-danger">Veuillez vous connecter pour voir vos adresses.</div>;
 
   // Ajout HTMLTextAreaElement pour couvrir tous les cas
   const handleChange = (

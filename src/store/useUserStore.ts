@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 type Role = 'client' | 'vendeur';
 
@@ -20,22 +21,52 @@ type UserState = {
   logout: () => void;
 };
 
-export const useUserStore = create<UserState>((set) => ({
+const initialState: Omit<UserState, 'setUser' | 'logout'> = {
   uid: '',
   email: '',
   displayName: '',
   role: '',
   isLoggedIn: false,
+};
 
-  setUser: ({ uid, email, displayName, role }) =>
-    set({ uid, email, displayName, role, isLoggedIn: true }),
+export const useUserStore = create<UserState>()(
+  persist(
+    (set) => ({
+      ...initialState,
 
-  logout: () =>
-    set({
-      uid: '',
-      email: '',
-      displayName: '',
-      role: '',
-      isLoggedIn: false,
+      setUser: ({ uid, email, displayName, role }) =>
+        set({
+          uid,
+          email,
+          displayName,
+          role,
+          isLoggedIn: true
+        }),
+
+      logout: () => {
+        set({
+          ...initialState
+        });
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('user-store');
+        }
+      },
     }),
-}));
+    {
+      name: 'user-store',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        uid: state.uid,
+        email: state.email,
+        displayName: state.displayName,
+        role: state.role,
+        isLoggedIn: state.isLoggedIn,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state && !state.isLoggedIn) {
+          state.logout();
+        }
+      },
+    }
+  )
+);

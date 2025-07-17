@@ -50,22 +50,29 @@ export const Header = () => {
     });
   };
 
-  // Firebase auth listener
   useEffect(() => {
+    let ignore = false;
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (ignore) return;
       if (user && user.emailVerified) {
-        userStore.setUser({
-          uid: user.uid,
-          email: user.email!,
-          displayName: user.displayName ?? '',
-          role: userStore.role || 'client',
-        });
+        // Ne met à jour le store que si l'uid change
+        if (userStore.uid !== user.uid) {
+          userStore.setUser({
+            uid: user.uid,
+            email: user.email!,
+            displayName: user.displayName ?? '',
+            role: userStore.role || 'client',
+          });
+        }
       } else {
-        userStore.logout();
+        if (userStore.isLoggedIn) userStore.logout();
       }
     });
-    return () => unsubscribe();
-  }, [userStore]);
+    return () => {
+      ignore = true;
+      unsubscribe();
+    };
+  }, []); // dépendance vide pour éviter la boucle
 
   // Gestion thème clair/sombre
   useEffect(() => {

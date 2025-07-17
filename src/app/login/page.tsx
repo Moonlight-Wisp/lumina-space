@@ -10,6 +10,8 @@ import { Form, Button, Container, Card, Row, Col, InputGroup } from 'react-boots
 import toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
+import styles from './page.module.css';
+
 export default function LoginPage() {
   const router = useRouter();
   const userStore = useUserStore();
@@ -47,19 +49,32 @@ export default function LoginPage() {
       if (!userCred.user.emailVerified) {
         toast.error('Veuillez vérifier votre e-mail avant de vous connecter.');
         await auth.signOut();
+        userStore.logout();
         setLoading(false);
         return;
       }
 
-      userStore.setUser({
+      const userData = {
         uid: userCred.user.uid,
         email: userCred.user.email!,
         displayName: userCred.user.displayName ?? '',
         role: 'client',
-      });
+      };
 
-      toast.success('Connexion réussie !');
-      router.push('/dashboard/client');
+      userStore.setUser(userData);
+      
+      // Vérification que le store est bien mis à jour
+      setTimeout(() => {
+        const state = useUserStore.getState();
+        if (state.isLoggedIn && state.uid) {
+          toast.success('Connexion réussie !');
+          router.push('/');
+        } else {
+          toast.error('Erreur de connexion, veuillez réessayer.');
+          auth.signOut();
+          userStore.logout();
+        }
+      }, 100);
     } catch (error) {
       // On peut affiner le typage si besoin, ici on cast any par sécurité
       const message = (error as Error).message || 'Identifiants invalides';
@@ -70,31 +85,22 @@ export default function LoginPage() {
   };
 
   return (
-    <Container
-      fluid
-      className="d-flex justify-content-center align-items-center"
-      style={{
-        minHeight: '100vh',
-        background: 'url(/images/login-bg.jpg) no-repeat center/cover',
-      }}
-    >
-      <Row className="w-100" style={{ maxWidth: 1100 }}>
-        <Col md={6} className="d-none d-md-flex align-items-center justify-content-center position-relative" style={{ minHeight: 500 }}>
+    <main className={styles.loginPage}>
+      <div className={styles.loginContent}>
+        <div className={styles.imageWrapper}>
           <Image
-            src="/images/login-side.png"
-            alt="Connexion Lumina"
-            fill
+            src="/images/Nouveautes/Matter-Smart-sans-fond.png"
+            alt="Connexion Lumina Smart"
+            width={500}
+            height={500}
             style={{ objectFit: 'contain' }}
-            className="mb-6 animate__animated animate__fadeInLeft"
+            className="animate__animated animate__fadeInLeft"
             priority
           />
-        </Col>
+        </div>
 
-        <Col md={6} className="d-flex align-items-center justify-content-center">
-          <Card
-            className="p-4 glass-bg w-100 animate__animated animate__fadeInUp"
-            style={{ maxWidth: 480 }}
-          >
+        <div>
+          <div className="glass-bg p-4 animate__animated animate__fadeInUp">
             <h3 className="mb-4 text-center">Connexion</h3>
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="email">
@@ -139,9 +145,9 @@ export default function LoginPage() {
                 {loading ? 'Connexion...' : 'Se connecter'}
               </Button>
             </Form>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }

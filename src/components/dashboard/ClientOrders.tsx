@@ -10,12 +10,16 @@ export default function ClientOrders() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!uid) return;
+    if (!uid) {
+      setLoading(false);
+      return;
+    }
     axios.get(`/api/orders?userId=${uid}`)
       .then(res => setOrders(res.data))
       .finally(() => setLoading(false));
   }, [uid]);
 
+  if (!uid) return <div className="mt-4 text-danger">Veuillez vous connecter pour voir vos commandes.</div>;
   if (loading) return <Spinner animation="border" className="mt-4" />;
   if (!orders.length) return <div className="mt-4">Aucune commande trouvée.</div>;
 

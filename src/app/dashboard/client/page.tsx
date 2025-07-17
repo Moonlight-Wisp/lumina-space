@@ -10,14 +10,24 @@ const Wishlist = dynamic(() => import('@/components/dashboard/Wishlist'), { ssr:
 const AddressBook = dynamic(() => import('@/components/dashboard/AddressBook'), { ssr: false });
 
 export default function ClientDashboard() {
-  const { isLoggedIn, role } = useUserStore();
+  const { isLoggedIn, role, uid } = useUserStore();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoggedIn || role !== 'client') {
+    if (!isLoggedIn || role !== 'client' || !uid) {
       router.push('/');
     }
-  }, [isLoggedIn, role, router]);
+  }, [isLoggedIn, role, uid, router]);
+
+  if (!isLoggedIn || role !== 'client' || !uid) {
+    return (
+      <div className="container mt-5 pt-5 text-center">
+        <h2>Accès refusé</h2>
+        <p className="text-danger">Vous devez être connecté en tant que client pour accéder à ce dashboard.</p>
+        <Button variant="primary" onClick={() => router.push('/login')}>Se connecter</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-5 pt-5">

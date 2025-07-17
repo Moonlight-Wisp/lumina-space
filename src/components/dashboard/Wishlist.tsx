@@ -11,7 +11,11 @@ export default function Wishlist() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!uid) return;
+    if (!uid) {
+      setLoading(false);
+      setProducts([]);
+      return;
+    }
     const fetchWishlist = async () => {
       setLoading(true);
       try {
@@ -34,19 +38,24 @@ export default function Wishlist() {
   }, [uid]);
 
   const handleRemove = async (productId: string) => {
-    if (!uid) return;
+    if (!uid) {
+      toast.error("Veuillez vous connecter pour modifier la wishlist.");
+      return;
+    }
     try {
       await axios.delete('/api/wishlist', { data: { userId: uid, productId } });
       setWishlist(wishlist.filter(id => id !== productId));
       setProducts(products.filter(p => p.id !== productId));
     } catch (error) {
-      console.error("Erreur lors de la suppression du produit", error);
+      toast.error("Erreur lors de la suppression");
     }
   };
 
+  if (!uid) return <div className="mt-4 text-danger">Veuillez vous connecter pour voir votre wishlist.</div>;
+
   if (loading) return <Spinner animation="border" className="mt-4" />;
 
-  if (!products.length) return <div className="mt-4">Votre liste de souhaits est vide.</div>;
+  if (!products.length) return <div className="mt-4">Votre wishlist est vide.</div>;
 
   return (
     <div className="mt-4">

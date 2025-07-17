@@ -80,7 +80,7 @@ export default function ProfileClient() {
       <div className="bg-white dark:bg-black glass-bg rounded-4 p-4 mb-4 shadow">
         <div className="d-flex align-items-center gap-4">
           <Image
-            src="/images/avatar-placeholder.png"
+            src="/images/Temoignages/35dd54ce9da554d665eb0979b0d7febd.jpg"
             alt="Avatar"
             className="rounded-circle border border-info"
             width={100}

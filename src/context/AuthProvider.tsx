@@ -31,32 +31,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser && firebaseUser.emailVerified) {
-        try {
+      try {
+        if (firebaseUser && firebaseUser.emailVerified) {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setUser({
               uid: firebaseUser.uid,
               email: firebaseUser.email || '',
-              displayName: userData.displayName,
-              role: userData.role,
+              displayName: userData.displayName ?? '',
+              role: userData.role ?? 'client',
               emailVerified: firebaseUser.emailVerified,
             });
           } else {
             console.warn('Aucun document utilisateur trouvé.');
-            setUser(null);
+            setUser({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              displayName: firebaseUser.displayName ?? '',
+              role: 'client',
+              emailVerified: firebaseUser.emailVerified,
+            });
           }
-        } catch (error) {
-          console.error('Erreur lors de la récupération de l’utilisateur Firestore:', error);
+        } else {
           setUser(null);
         }
-      } else {
+      } catch (error) {
+        console.error('Erreur lors de la récupération de l’utilisateur Firestore:', error);
         setUser(null);
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
