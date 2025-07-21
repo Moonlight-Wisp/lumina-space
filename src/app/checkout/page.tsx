@@ -8,13 +8,24 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
+// 📝 Définition du type pour le formulaire
+type FormData = {
+  fullName: string;
+  email: string;
+  address: string;
+  city: string;
+  country: string;
+  zip: string;
+  paymentMethod: string;
+};
+
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCartStore();
   const { uid, isLoggedIn } = useUserStore();
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormData>({
     fullName: '',
     email: '',
     address: '',
@@ -30,26 +41,38 @@ export default function CheckoutPage() {
       router.push('/login');
       return;
     }
-    
+
     if (items.length === 0) {
       toast.error('Votre panier est vide.');
       router.push('/cart');
     }
   }, [items, router, isLoggedIn]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
-      // Validation des champs requis
-      const requiredFields = ['fullName', 'email', 'address', 'city', 'country', 'zip'];
-      const missingFields = requiredFields.filter(field => !form[field]);
-      
+      // ✅ Typage propre ici
+      const requiredFields: (keyof FormData)[] = [
+        'fullName',
+        'email',
+        'address',
+        'city',
+        'country',
+        'zip'
+      ];
+
+      const missingFields = requiredFields.filter(
+        (field) => !form[field]
+      );
+
       if (missingFields.length > 0) {
         toast.error('Veuillez remplir tous les champs obligatoires');
         return;
@@ -61,7 +84,6 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Création de la commande
       if (!isLoggedIn || !uid) {
         toast.error('Veuillez vous connecter pour passer une commande');
         router.push('/login');
@@ -103,7 +125,6 @@ export default function CheckoutPage() {
         throw new Error(data.error || 'Erreur lors de la création de la commande');
       }
 
-      // Si la commande est créée avec succès
       toast.success('Commande confirmée avec succès !');
       clearCart();
       router.push(`/success?orderId=${data._id}`);
@@ -150,7 +171,9 @@ export default function CheckoutPage() {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label id="paymentMethodLabel" htmlFor="paymentMethod">Méthode de paiement</Form.Label>
+                <Form.Label id="paymentMethodLabel" htmlFor="paymentMethod">
+                  Méthode de paiement
+                </Form.Label>
                 <Form.Select
                   id="paymentMethod"
                   name="paymentMethod"
@@ -212,13 +235,18 @@ export default function CheckoutPage() {
 
           <div className="d-flex justify-content-between align-items-center">
             <h5>Total à payer :</h5>
-            <h4 className="text-success fw-bold">{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' }).format(totalPrice)}</h4>
+            <h4 className="text-success fw-bold">
+              {new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'XOF'
+              }).format(totalPrice)}
+            </h4>
           </div>
 
           <div className="text-end mt-3">
-            <Button 
-              variant="success" 
-              type="submit" 
+            <Button
+              variant="success"
+              type="submit"
               disabled={isLoading}
             >
               {isLoading ? 'Traitement en cours...' : 'Confirmer la commande'}

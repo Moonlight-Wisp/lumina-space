@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
 import Notification from '@/models/Notification';
+import type { OrderItem } from '@/types/order';
 import { connectToDatabase } from '@/lib/mongodb';
 
 export async function GET(req: NextRequest) {
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
       const orderObj = order.toObject();
       
       // Récupérer les détails des produits pour chaque item
-      const enrichedItems = await Promise.all(orderObj.items.map(async (item) => {
+      const enrichedItems = await Promise.all(orderObj.items.map(async (item: OrderItem) => {
         try {
           const product = await Product.findById(item.productId);
           return {

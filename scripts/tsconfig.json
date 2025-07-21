@@ -1,12 +1,21 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
+    "target": "ES2017",
     "module": "commonjs",
+    "lib": ["es2017", "esnext"],
+    "skipLibCheck": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
     "outDir": "../dist/scripts",
     "baseUrl": ".",
     "paths": {
       "@/*": ["../src/*"]
     }
   },
-  "include": ["./**/*"]
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "../node_modules"]
 }

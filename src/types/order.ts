@@ -4,6 +4,9 @@ export interface OrderItem {
   productId: string;
   quantity: number;
   price: number;
+  sellerId: string;
+  title?: string;
+  image?: string | null;
 }
 
 export interface Order {
