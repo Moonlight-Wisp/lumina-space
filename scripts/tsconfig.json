@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-<<<<<<< HEAD
     "target": "ES2017",
     "module": "commonjs",
     "lib": ["es2017", "esnext"],
@@ -19,16 +18,4 @@
   },
   "include": ["./**/*"],
   "exclude": ["node_modules", "../node_modules"]
-=======
-	"target": "ES6",
-	"module": "commonjs",
-	"strict": true,
-	"esModuleInterop": true,
-	"skipLibCheck": true,
-	"forceConsistentCasingInFileNames": true
-  },
-  "include": [
-	"./**/*.ts"
-  ]
->>>>>>> 8bcf0fb8005f0f632472992b1404b9e3bc35e721
 }
