@@ -1,12 +1,13 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "outDir": "../dist/scripts",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["../src/*"]
-    }
+	"target": "ES6",
+	"module": "commonjs",
+	"strict": true,
+	"esModuleInterop": true,
+	"skipLibCheck": true,
+	"forceConsistentCasingInFileNames": true
   },
-  "include": ["./**/*"]
+  "include": [
+	"./**/*.ts"
+  ]
 }

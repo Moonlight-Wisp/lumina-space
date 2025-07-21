@@ -2,7 +2,6 @@
 
 import { Container, Form, Row, Col, Button } from 'react-bootstrap';
 import { useCartStore } from '@/store/useCartStore';
-import { useUserStore } from '@/store/useUserStore';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -10,10 +9,8 @@ import toast from 'react-hot-toast';
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCartStore();
-  const { uid, isLoggedIn } = useUserStore();
   const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -25,94 +22,23 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      toast.error('Veuillez vous connecter pour passer une commande');
-      router.push('/login');
-      return;
-    }
-    
     if (items.length === 0) {
       toast.error('Votre panier est vide.');
       router.push('/cart');
     }
-  }, [items, router, isLoggedIn]);
+  }, [items, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    try {
-      // Validation des champs requis
-      const requiredFields = ['fullName', 'email', 'address', 'city', 'country', 'zip'];
-      const missingFields = requiredFields.filter(field => !form[field]);
-      
-      if (missingFields.length > 0) {
-        toast.error('Veuillez remplir tous les champs obligatoires');
-        return;
-      }
 
-      if (items.length === 0) {
-        toast.error('Votre panier est vide');
-        router.push('/cart');
-        return;
-      }
-
-      // Création de la commande
-      if (!isLoggedIn || !uid) {
-        toast.error('Veuillez vous connecter pour passer une commande');
-        router.push('/login');
-        return;
-      }
-
-      const orderData = {
-        userId: uid,
-        items: items.map(item => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          price: item.price,
-          title: item.name
-        })),
-        shippingAddress: {
-          street: form.address,
-          city: form.city,
-          postalCode: form.zip,
-          country: form.country
-        },
-        totalAmount: totalPrice,
-        customerInfo: {
-          fullName: form.fullName,
-          email: form.email
-        }
-      };
-
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erreur lors de la création de la commande');
-      }
-
-      // Si la commande est créée avec succès
-      toast.success('Commande confirmée avec succès !');
-      clearCart();
-      router.push(`/success?orderId=${data._id}`);
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Une erreur est survenue lors de la création de la commande');
-    } finally {
-      setIsLoading(false);
-    }
+    // Simulation de paiement (à remplacer par Stripe/PayPal plus tard)
+    toast.success('Commande confirmée avec succès !');
+    clearCart();
+    router.push('/success');
   };
 
   return (
@@ -150,7 +76,7 @@ export default function CheckoutPage() {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label id="paymentMethodLabel" htmlFor="paymentMethod">Méthode de paiement</Form.Label>
+                <Form.Label htmlFor="paymentMethod">Méthode de paiement</Form.Label>
                 <Form.Select
                   id="paymentMethod"
                   name="paymentMethod"
@@ -212,16 +138,12 @@ export default function CheckoutPage() {
 
           <div className="d-flex justify-content-between align-items-center">
             <h5>Total à payer :</h5>
-            <h4 className="text-success fw-bold">{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' }).format(totalPrice)}</h4>
+            <h4 className="text-success fw-bold">{totalPrice.toFixed(2)} XOF</h4>
           </div>
 
           <div className="text-end mt-3">
-            <Button 
-              variant="success" 
-              type="submit" 
-              disabled={isLoading}
-            >
-              {isLoading ? 'Traitement en cours...' : 'Confirmer la commande'}
+            <Button variant="success" type="submit">
+              Confirmer la commande
             </Button>
           </div>
         </Form>

@@ -1,36 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Container, Button, Card } from 'react-bootstrap';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Container, Button } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { formatPrice } from '@/utils/format';
 
 export default function SuccessPage() {
   const router = useRouter();
-  const [order, setOrder] = useState<{
-    _id: string;
-    items: Array<{
-      productId: string;
-      quantity: number;
-      price: number;
-      title: string;
-    }>;
-    totalAmount: number;
-  } | null>(null);
-  const searchParams = useSearchParams();
-  const orderId = searchParams?.get('orderId');
+  const { clearCart } = useCartStore();
 
   useEffect(() => {
-    if (orderId) {
-      fetch(`/api/orders/${orderId}`)
-        .then(res => res.json())
-        .then(data => setOrder(data))
-        .catch(err => console.error('Erreur lors de la récupération de la commande:', err));
-    }
-  }, [orderId]);
+    clearCart(); // Vide le panier à l'arrivée sur la page de succès
+  }, [clearCart]);
 
   return (
     <Container className="py-5 d-flex flex-column align-items-center text-center">
@@ -60,38 +43,6 @@ export default function SuccessPage() {
       >
         Une confirmation vous a été envoyée par e-mail. Votre commande est en cours de traitement.
       </motion.p>
-
-      {order && (
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="w-100 mb-4"
-        >
-          <Card className="glass-bg">
-            <Card.Header>
-              <h5 className="mb-0">Détails de la commande #{order._id}</h5>
-            </Card.Header>
-            <Card.Body>
-              <div className="mb-3">
-                <h6>Articles commandés :</h6>
-                {order.items.map((item: any) => (
-                  <div key={item.productId} className="d-flex justify-content-between mb-2">
-                    <span>{item.quantity}x {item.title}</span>
-                    <span>{formatPrice(item.price * item.quantity)}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="border-top pt-3">
-                <div className="d-flex justify-content-between">
-                  <strong>Total</strong>
-                  <strong>{formatPrice(order.totalAmount)}</strong>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </motion.div>
-      )}
 
       <motion.div
         initial={{ opacity: 0 }}

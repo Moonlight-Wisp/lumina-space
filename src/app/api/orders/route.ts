@@ -6,114 +6,30 @@ import Notification from '@/models/Notification';
 import { connectToDatabase } from '@/lib/mongodb';
 
 export async function GET(req: NextRequest) {
-  try {
-    console.log('Récupération des commandes...');
-    await connectToDatabase();
-    const userId = req.nextUrl.searchParams.get('userId');
-    const sellerId = req.nextUrl.searchParams.get('sellerId');
+  await connectToDatabase();
+  const userId = req.nextUrl.searchParams.get('userId');
+  const sellerId = req.nextUrl.searchParams.get('sellerId');
 
-    console.log('Paramètres de recherche:', { userId, sellerId });
-
-    let orders;
-    if (userId) {
-      orders = await Order.find({ userId }).sort({ createdAt: -1 });
-      console.log(`Commandes trouvées pour l'utilisateur ${userId}:`, orders.length);
-    } else if (sellerId) {
-      orders = await Order.find({ 'items.sellerId': sellerId }).sort({ createdAt: -1 });
-      console.log(`Commandes trouvées pour le vendeur ${sellerId}:`, orders.length);
-    } else {
-      orders = await Order.find().sort({ createdAt: -1 });
-      console.log('Toutes les commandes:', orders.length);
-    }
-
-    if (!orders || orders.length === 0) {
-      console.log('Aucune commande trouvée');
-      return NextResponse.json([]);
-    }
-
-    // Enrichir les commandes avec les informations des produits
-    const enrichedOrders = await Promise.all(orders.map(async (order) => {
-      const orderObj = order.toObject();
-      
-      // Récupérer les détails des produits pour chaque item
-      const enrichedItems = await Promise.all(orderObj.items.map(async (item) => {
-        try {
-          const product = await Product.findById(item.productId);
-          return {
-            ...item,
-            title: product?.title || 'Produit non trouvé',
-            image: product?.images?.[0] || null
-          };
-        } catch (err) {
-          console.error(`Erreur lors de la récupération du produit ${item.productId}:`, err);
-          return item;
-        }
-      }));
-
-      return {
-        ...orderObj,
-        items: enrichedItems
-      };
-    }));
-
-    console.log('Commandes enrichies renvoyées avec succès');
-    return NextResponse.json(enrichedOrders);
-  } catch (error) {
-    console.error('Erreur lors de la récupération des commandes:', error);
-    return NextResponse.json({ error: 'Erreur lors de la récupération des commandes' }, { status: 500 });
+  let orders;
+  if (userId) {
+    orders = await Order.find({ userId }).sort({ createdAt: -1 });
+  } else if (sellerId) {
+    // Récupérer toutes les commandes contenant des produits du vendeur
+    orders = await Order.find({ 'items.sellerId': sellerId }).sort({ createdAt: -1 });
+  } else {
+    orders = await Order.find().sort({ createdAt: -1 });
   }
+  return NextResponse.json(orders);
 }
 
 export async function POST(req: NextRequest) {
+  await connectToDatabase();
+  const body = await req.json();
+  const order = new Order({ ...body });
+  await order.save();
+
+  // Génération notifications vendeurs
   try {
-    console.log('Début de la création de commande');
-    await connectToDatabase();
-    const body = await req.json();
-    
-    // Validation des données requises
-    if (!body.userId || !body.items || !body.items.length || !body.shippingAddress) {
-      console.error('Données manquantes:', { body });
-      return NextResponse.json({ 
-        error: 'Données invalides: userId, items et shippingAddress sont requis' 
-      }, { status: 400 });
-    }
-
-    // Validation de l'adresse
-    const { street, city, postalCode, country } = body.shippingAddress;
-    if (!street || !city || !postalCode || !country) {
-      console.error('Adresse invalide:', body.shippingAddress);
-      return NextResponse.json({ 
-        error: 'Adresse de livraison invalide' 
-      }, { status: 400 });
-    }
-
-    // Calcul du montant total
-    let totalAmount = 0;
-    for (const item of body.items) {
-      if (!item.productId || !item.quantity || !item.price) {
-        console.error('Item invalide:', item);
-        return NextResponse.json({ 
-          error: 'Données d\'article invalides' 
-        }, { status: 400 });
-      }
-      totalAmount += item.quantity * item.price;
-    }
-
-    const orderData = {
-      ...body,
-      totalAmount,
-      status: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    console.log('Création de la commande avec les données:', orderData);
-    const order = new Order(orderData);
-    await order.save();
-    console.log('Commande créée avec succès:', order._id);
-
-    // Génération notifications vendeurs
-    try {
     // Récupérer tous les produits commandés (pour retrouver les vendeurs)
     const productIds = order.items.map((item: { productId: string }) => item.productId);
     const products = await Product.find({ _id: { $in: productIds } });
@@ -144,15 +60,7 @@ export async function POST(req: NextRequest) {
     // Ne bloque pas la création de commande si la notif échoue
     console.error('Erreur notification vendeur:', e);
   }
-
-  // Retourner la commande créée
   return NextResponse.json(order, { status: 201 });
-  } catch (error) {
-    console.error('Erreur lors de la création de la commande:', error);
-    return NextResponse.json({ 
-      error: 'Erreur lors de la création de la commande' 
-    }, { status: 500 });
-  }
 }
 
 export async function PUT(req: NextRequest) {
