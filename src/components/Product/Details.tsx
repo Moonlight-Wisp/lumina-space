@@ -22,7 +22,7 @@ const Details = ({ product }: Props) => {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <h1 className={styles.title}>{product.title}</h1>
-        <WishlistButton productId={product._id} />
+        <WishlistButton productId={product.id} />
       </div>
 
       <div className={styles.priceSection}>
