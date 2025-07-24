@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 export async function connectToDatabase() {
   try {
-    const DB_NAME = mongoose.connect(process.env.MONGODB_URI!,{
+    const DB_NAME = mongoose.connect(process.env.MongoDB_Atlas!,{
       dbName:"luminaspace"
     })
 
