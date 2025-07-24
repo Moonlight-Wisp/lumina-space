@@ -30,7 +30,7 @@ export default function VendeurDashboard() {
   }, []);
 
   const handleSaveProduct = async (product: Partial<Product>) => {
-    if (editProduct && editProduct.id) {
+    if (editProduct && editProduct?._id) {
       await axios.put('/api/products', { ...editProduct, ...product });
     } else {
       await axios.post('/api/products', product);
@@ -48,7 +48,7 @@ export default function VendeurDashboard() {
 
   const handleDelete = async (id: string) => {
     await axios.delete('/api/products', { data: { id } });
-    setProducts(products.filter(p => p.id !== id));
+    setProducts(products.filter(p => p?._id !== id));
   };
 
   return (
@@ -64,14 +64,14 @@ export default function VendeurDashboard() {
         <h4>Mes produits</h4>
         <div className="row">
           {products.map((p) => (
-            <div className="col-md-4 mb-3" key={p.id}>
+            <div className="col-md-4 mb-3" key={p?._id}>
               <div className="card glass-bg h-100 border-0 text-center p-3">
                 <Image src={p.images?.[0]} alt={p.title} width={400} height={180} className="card-img-cover mb-2 w-100" style={{ objectFit: 'cover' }} />
                 <div className="card-body">
                   <h5 className="card-title">{p.title}</h5>
                   <p className="card-text fw-bold">{p.price} €</p>
                   <button className="btn btn-outline-primary me-2" onClick={() => handleEdit(p)}>Modifier</button>
-                  <button className="btn btn-outline-danger" onClick={() => handleDelete(p.id)}>Supprimer</button>
+                  <button className="btn btn-outline-danger" onClick={() => handleDelete(p?._id)}>Supprimer</button>
                 </div>
               </div>
             </div>

@@ -4,12 +4,11 @@ import { connectToDatabase } from '@/lib/mongodb';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDatabase();
-    const order = await Order.findById(params.id);
-
+    const order= await params
     if (!order) {
       return NextResponse.json(
         { error: 'Commande non trouvée' },

@@ -34,13 +34,13 @@ export default function ProductsListPage() {
         <Row>
           {products.length === 0 && <p>Aucun produit disponible.</p>}
           {products.map((p) => (
-            <Col md={4} key={p.id} className="mb-4">
+            <Col md={4} key={p?._id} className="mb-4">
               <Card className="glass-bg h-100 border-0 text-center p-3">
                 <Image src={p.images[0]} alt={p.title} width={400} height={240} className="card-img-cover mb-2"/>
                 <Card.Body>
                   <Card.Title>{p.title}</Card.Title>
                   <Card.Text className="fw-bold">{p.price} €</Card.Text>
-                  <Link href={`/product/${p.id}`}><Button className="btn-accent">Voir</Button></Link>
+                  <Link href={`/product/${p?._id}`}><Button className="btn-accent">Voir</Button></Link>
                 </Card.Body>
               </Card>
             </Col>

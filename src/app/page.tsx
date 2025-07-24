@@ -41,12 +41,14 @@ export default function Home() {
   const [nouveautes, setNouveautes] = useState<Product[]>([]);
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const { data } = await axios.get('/api/products');
-        console.log('Données des produits:', data);
+        if(data && Array.isArray(data)){
+   console.log('Données des produits:', data);
         // On trie par date de création pour les nouveautés
         const sortedByDate = [...data].sort((a, b) => 
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -55,9 +57,11 @@ export default function Home() {
 
         // Pour les bestsellers, on prend les 3 premiers (à terme, on pourrait les trier par nombre de ventes)
         setBestSellers(data.slice(0, 3));
-        setLoading(false);
+        }
+        
       } catch (error) {
-        console.error('Erreur lors du chargement des produits:', error);
+        setErrorMsg('Impossible de charger les produits. Veuillez réessayer plus tard.');
+      }finally{
         setLoading(false);
       }
     };
@@ -76,6 +80,18 @@ export default function Home() {
     arrows: false,
   };
 
+  if (errorMsg) {
+    return (
+      <main>
+        <div className="flex flex-col items-center justify-center min-h-[300px] animate__animated animate__fadeInDown">
+          <span className="text-6xl mb-2">😕</span>
+          <h2 className="text-2xl font-bold text-red-600 mb-1">Oups, un problème est survenu</h2>
+          <p className="text-gray-600 mb-2">{errorMsg}</p>
+          <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+        </div>
+      </main>
+    );
+  }
   return (
     <main>
       {/* Hero Slider */}
@@ -146,13 +162,14 @@ export default function Home() {
                 <p>Aucune nouveauté disponible pour le moment.</p>
               </Col>
             ) : (
-              nouveautes.map(p => (
+              <>
+              {nouveautes?.length>0 && nouveautes?.map(p => (
                 <Col md={3} key={p._id} className="mb-3">
                   <Card className="glass-bg h-100 border-0">
                     <Link href={`/product/${p._id}`} className="text-decoration-none">
                       <div style={{ position: 'relative', width: '100%', height: '240px' }}>
                         <Image 
-                          src={p.images[0]} 
+                          src={p?.images?.length>0 ? p?.images[0] : "/images/Nouveautes/Matter-Smart-avec fond.jpg"} 
                           alt={p.title} 
                           fill 
                           style={{ objectFit: 'cover' }}
@@ -167,7 +184,8 @@ export default function Home() {
                     </Link>
                   </Card>
                 </Col>
-              ))
+              ))}         
+              </>
             )}
           </Row>
         </Container>
@@ -179,7 +197,7 @@ export default function Home() {
           <h2 className={`text-center mb-4 ${styles.homeTitle}`}>Nos univers lumineux</h2>
           <p className={`text-center mb-4 ${styles.homeSubtitle}`}>Explorez nos catégories phares et trouvez l’inspiration pour chaque pièce de votre maison.</p>
           <Row>
-            {categories.map((c, index) => (
+            {categories?.length>0 && categories?.map((c, index) => (
               <Col md={4} key={c.id} className="mb-4">
                 <Card className="glass-bg h-100 border-0 text-center p-3">
                   <div className={styles.categoryIcon}>
@@ -214,12 +232,13 @@ export default function Home() {
                 <p>Aucun bestseller disponible pour le moment.</p>
               </Col>
             ) : (
-              bestSellers.map((p) => (
+             <>
+             { bestSellers?.length>0 && bestSellers?.map((p) => (
                 <Col md={4} key={p._id} className="mb-4">
                   <Card className="glass-bg h-100 border-0 text-center p-3">
                     <span className={styles.bestsellerBadge}><FaStar className="me-1" /> Bestseller</span>
                     <Link href={`/product/${p._id}`} className="text-decoration-none">
-                      <Image src={p.images[0]} alt={p.title} width={400} height={240} className="card-img-cover mb-2"/>
+                      <Image  src={p?.images?.length>0 ? p?.images[0] : "/images/Nouveautes/Matter-Smart-avec fond.jpg"}  alt={p.title} width={400} height={240} className="card-img-cover mb-2"/>
                       <Card.Body>
                         <Card.Title className="text-dark">{p.title}</Card.Title>
                         <Card.Text className="fw-bold text-primary">{p.price}€</Card.Text>
@@ -228,7 +247,8 @@ export default function Home() {
                     </Link>
                   </Card>
                 </Col>
-              ))
+              ))}
+             </>
             )}
           </Row>
         </Container>

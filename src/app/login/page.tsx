@@ -21,6 +21,7 @@ export default function LoginPage() {
   const userStore = useUserStore();
 
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
 
@@ -53,6 +54,7 @@ export default function LoginPage() {
 const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
   if (!form.email || !form.password) {
+    setErrorMsg('Veuillez remplir tous les champs');
     toast.error('Veuillez remplir tous les champs');
     return;
   }
@@ -103,6 +105,7 @@ const handleSubmit = async (e: FormEvent) => {
     if (error instanceof Error) {
       message = error.message;
     }
+    setErrorMsg(message);
     toast.error(message);
   } finally {
     setLoading(false);
@@ -126,6 +129,14 @@ const handleSubmit = async (e: FormEvent) => {
         </div>
 
         <div>
+          {errorMsg && (
+            <div className="flex flex-col items-center justify-center min-h-[120px] mb-4 animate__animated animate__fadeInDown">
+              <span className="text-5xl mb-2">😕</span>
+              <h2 className="text-xl font-bold text-red-600 mb-1">Oups, un problème est survenu</h2>
+              <p className="text-gray-600 mb-2">{errorMsg}</p>
+              <Button variant="primary" onClick={() => setErrorMsg("")}>Réessayer</Button>
+            </div>
+          )}
           <div className="glass-bg p-4 animate__animated animate__fadeInUp">
             <h3 className="mb-4 text-center">Connexion</h3>
             <Form onSubmit={handleSubmit}>

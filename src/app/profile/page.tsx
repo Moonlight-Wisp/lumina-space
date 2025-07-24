@@ -72,7 +72,16 @@ export default function ProfileClient() {
   }
 
   if (!profile) {
-    return <Container className="py-5 text-center">Profil introuvable.</Container>;
+    return (
+      <Container className="py-5 text-center">
+        <div className="flex flex-col items-center justify-center min-h-[120px] animate__animated animate__fadeInDown">
+          <span className="text-5xl mb-2">😕</span>
+          <h2 className="text-xl font-bold text-red-600 mb-1">Oups, profil introuvable</h2>
+          <p className="text-gray-600 mb-2">Impossible de charger votre profil pour le moment.<br />Veuillez réessayer plus tard ou revenir à l'accueil.</p>
+          <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+        </div>
+      </Container>
+    );
   }
 
   return (

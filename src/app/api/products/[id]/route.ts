@@ -5,18 +5,13 @@ import { ObjectId } from 'mongodb';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    if (!ObjectId.isValid(params.id)) {
-      return NextResponse.json(
-        { error: 'ID de produit invalide' },
-        { status: 400 }
-      );
-    }
+   const {id}= await params
 
     await connectToDatabase();
-    const product = await Product.findById(params.id);
+    const product = await Product.findById(id);
 
     return NextResponse.json(product);
   } catch (error) {

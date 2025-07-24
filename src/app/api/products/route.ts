@@ -4,9 +4,15 @@ import Product from '@/models/Product';
 import { connectToDatabase } from '@/lib/mongodb';
 
 export async function GET() {
-  await connectToDatabase();
+ try {
+   await connectToDatabase();
   const products = await Product.find().sort({ createdAt: -1 });
   return NextResponse.json(products);
+ } catch (error) {
+  console.log(error)
+  return NextResponse.json("une erreur s'est produite")
+
+ }
 }
 
 export async function POST(req: NextRequest) {

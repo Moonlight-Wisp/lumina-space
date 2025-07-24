@@ -14,6 +14,7 @@ export default function CheckoutPage() {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -47,15 +48,18 @@ export default function CheckoutPage() {
     
     try {
       // Validation des champs requis
-      const requiredFields = ['fullName', 'email', 'address', 'city', 'country', 'zip'];
-      const missingFields = requiredFields.filter(field => !form[field]);
       
+      const requiredFields = ['fullName', 'email', 'address', 'city', 'country', 'zip'] as const;
+      const missingFields = requiredFields.filter(field => !form[field as keyof typeof form]);
+
       if (missingFields.length > 0) {
+        setErrorMsg('Veuillez remplir tous les champs obligatoires');
         toast.error('Veuillez remplir tous les champs obligatoires');
         return;
       }
 
       if (items.length === 0) {
+        setErrorMsg('Votre panier est vide');
         toast.error('Votre panier est vide');
         router.push('/cart');
         return;
@@ -63,6 +67,7 @@ export default function CheckoutPage() {
 
       // Création de la commande
       if (!isLoggedIn || !uid) {
+        setErrorMsg('Veuillez vous connecter pour passer une commande');
         toast.error('Veuillez vous connecter pour passer une commande');
         router.push('/login');
         return;
@@ -100,6 +105,7 @@ export default function CheckoutPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        setErrorMsg(data.error || 'Erreur lors de la création de la commande');
         throw new Error(data.error || 'Erreur lors de la création de la commande');
       }
 
@@ -109,6 +115,7 @@ export default function CheckoutPage() {
       router.push(`/success?orderId=${data._id}`);
     } catch (error) {
       console.error('Erreur:', error);
+      if (!errorMsg) setErrorMsg('Une erreur est survenue lors de la création de la commande');
       toast.error('Une erreur est survenue lors de la création de la commande');
     } finally {
       setIsLoading(false);
@@ -117,6 +124,14 @@ export default function CheckoutPage() {
 
   return (
     <Container className="py-5">
+      {errorMsg && (
+        <div className="flex flex-col items-center justify-center min-h-[120px] mb-4 animate__animated animate__fadeInDown">
+          <span className="text-5xl mb-2">😕</span>
+          <h2 className="text-xl font-bold text-red-600 mb-1">Oups, un problème est survenu</h2>
+          <p className="text-gray-600 mb-2">{errorMsg}</p>
+          <Button variant="primary" onClick={() => setErrorMsg("")}>Réessayer</Button>
+        </div>
+      )}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}

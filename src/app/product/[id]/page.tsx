@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-
+import ReviewForm from '@/components/Product/ReviewForm';
 import Gallery from '@/components/Product/Gallery';
 import Details from '@/components/Product/Details';
 import AddToCart from '@/components/Product/AddToCart';
@@ -71,8 +71,13 @@ export default function ProductPage({ params }: { params: Params }) {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">Erreur</h1>
-        <p className="text-gray-600">{error}</p>
+        <span className="text-6xl mb-4">😕</span>
+        <h1 className="text-2xl font-bold text-red-600 mb-2">Oups, un problème est survenu</h1>
+        <p className="text-gray-600 mb-4">
+          Impossible de charger ce produit pour le moment.<br />
+          Veuillez réessayer plus tard ou revenir à la boutique.
+        </p>
+        <a href="/products" className="btn btn-primary">Retour à la boutique</a>
       </div>
     );
   }
@@ -91,7 +96,12 @@ export default function ProductPage({ params }: { params: Params }) {
       </div>
 
       <div className="mt-16">
-        <Reviews productId={product._id} />
+        {/* <Reviews productId={product._id} /> */}
+        {/* Ajout du formulaire d'avis utilisateur */}
+        <div className="mt-8">
+       
+          <ReviewForm productId={product._id} />
+        </div>
       </div>
 
       <div className="mt-24">

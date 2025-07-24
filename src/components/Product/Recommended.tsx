@@ -21,7 +21,7 @@ const Recommended = ({ productId, category }: Props) => {
       try {
         const { data } = await axios.get(`/api/products`);
         // Filtrer les produits de la même catégorie, hors produit courant
-        const filtered = data.filter((p: Product) => p.category === category && p.id !== productId);
+        const filtered = data.filter((p: Product) => p.category === category && p?._id !== productId);
         setProducts(filtered);
       } catch (error) {
         console.error('Erreur lors du chargement des produits recommandés', error);
@@ -47,8 +47,8 @@ const Recommended = ({ productId, category }: Props) => {
       ) : (
         <div className="d-flex flex-wrap gap-3">
           {products.map((product) => (
-            <Card key={product.id} style={{ width: '16rem' }} className="glass-bg p-2 shadow-sm">
-              <Link href={`/product/${product.id}`} className="text-decoration-none">
+            <Card key={product?._id} style={{ width: '16rem' }} className="glass-bg p-2 shadow-sm">
+              <Link href={`/product/${product?._id}`} className="text-decoration-none">
                 <Card.Img
                   variant="top"
                   src={product.images[0]}

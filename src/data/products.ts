@@ -2,7 +2,7 @@ import { Product } from '@/types/product';
 
 export const products: Product[] = [
   {
-    id: '1',
+    _id: '1',
     title: 'Lampe Aurora RGB',
     description: 'Créez des ambiances colorées et personnalisées avec cette lampe connectée RGB.',
     price: 89.99,
@@ -18,7 +18,7 @@ export const products: Product[] = [
     updatedAt: new Date(),
   },
   {
-    id: '2',
+    _id: '2',
     title: 'Cube Lumineux Intuitif',
     description: 'Un cube lumineux design pour une touche moderne et connectée.',
     price: 59.99,
@@ -34,7 +34,7 @@ export const products: Product[] = [
     updatedAt: new Date(),
   },
   {
-    id: '3',
+    _id: '3',
     title: 'Bande LED Synchronisée',
     description: 'Bande LED intelligente pour synchroniser votre éclairage avec la musique.',
     price: 39.99,

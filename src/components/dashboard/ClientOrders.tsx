@@ -19,7 +19,7 @@ interface Order {
   _id: string;
   items: OrderItem[];
   totalAmount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'return-requested';
   createdAt: string;
   shippingAddress: {
     street: string;
@@ -34,7 +34,8 @@ const statusColors = {
   processing: 'info',
   shipped: 'primary',
   delivered: 'success',
-  cancelled: 'danger'
+  cancelled: 'danger',
+  'return-requested': 'warning'
 };
 
 const statusLabels = {
@@ -42,7 +43,8 @@ const statusLabels = {
   processing: 'En traitement',
   shipped: 'Expédiée',
   delivered: 'Livrée',
-  cancelled: 'Annulée'
+  cancelled: 'Annulée',
+  'return-requested': 'Retour demandé'
 };
 
 export default function ClientOrders() {
@@ -272,6 +274,55 @@ export default function ClientOrders() {
               </div>
             </Modal.Body>
             <Modal.Footer>
+              {selectedOrder.status === 'pending' || selectedOrder.status === 'processing' ? (
+                <Button
+                  variant="danger"
+                  onClick={async () => {
+                    if (!window.confirm('Confirmer l\'annulation de cette commande ?')) return;
+                    try {
+                      const res = await fetch('/api/orders', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...selectedOrder, status: 'cancelled' }),
+                      });
+                      if (!res.ok) throw new Error('Erreur lors de l\'annulation');
+                      toast.success('Commande annulée');
+                      setShowDetails(false);
+                      setOrders(orders.map(o => o._id === selectedOrder._id ? { ...o, status: 'cancelled' } : o));
+                    } catch {
+                      toast.error('Erreur lors de l\'annulation');
+                    }
+                  }}
+                  className="me-2"
+                >
+                  Annuler la commande
+                </Button>
+              ) : null}
+              {selectedOrder.status === 'delivered' ? (
+                <Button
+                  variant="warning"
+                  onClick={async () => {
+                    if (!window.confirm('Demander un retour pour cette commande ?')) return;
+                    try {
+                      // Ici, on peut soit changer le statut, soit envoyer une notification SAV
+                      const res = await fetch('/api/orders', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...selectedOrder, status: 'return-requested' }),
+                      });
+                      if (!res.ok) throw new Error('Erreur lors de la demande de retour');
+                      toast.success('Demande de retour envoyée');
+                      setShowDetails(false);
+                      setOrders(orders.map(o => o._id === selectedOrder._id ? { ...o, status: 'return-requested' } : o));
+                    } catch {
+                      toast.error('Erreur lors de la demande de retour');
+                    }
+                  }}
+                  className="me-2"
+                >
+                  Demander un retour
+                </Button>
+              ) : null}
               <Button variant="outline-secondary" onClick={() => setShowDetails(false)}>
                 Fermer
               </Button>
